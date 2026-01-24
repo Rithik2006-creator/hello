@@ -226,32 +226,10 @@
   </div>
 
   <!-- ================= JS ================= -->
-  <script>
-    function toggleMenu() {
-      document.getElementById("navLinks").classList.toggle("show");
-    }
 
-    function sendMessage() {
-      const input = document.getElementById("userInput");
-      const messageBox = document.getElementById("messageBox");
-
-      if (!input.value.trim()) return;
-
-      messageBox.insertAdjacentHTML(
-        "beforeend",
-        `<div class="message user">${input.value}</div>`
-      );
-
-      input.value = "";
-
-      // auto-scroll
-      requestAnimationFrame(() => {
-        messageBox.lastElementChild.scrollIntoView({ behavior: "smooth" });
-      });
-    }
-  </script>
   <script src="script.js"></script>
 
 </body>
 </html>
+
 
