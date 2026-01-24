@@ -220,7 +220,7 @@
     </div>
 
     <div class="chat-input">
-      <input type="text" id="userInput" placeholder="Type your question here..." />
+      <input type="text" id="userInput" placeholder="Type your question here..." onchange="sendMessage()" />
       <button onclick="sendMessage()">Send</button>
     </div>
   </div>
@@ -250,6 +250,8 @@
       });
     }
   </script>
+  <script src="script.js"></script>
 
 </body>
 </html>
+
