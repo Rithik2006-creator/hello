@@ -60,22 +60,16 @@
       font-size: 0.9rem;
     }
 
-    .nav-links a:hover {
-      text-decoration: underline;
-    }
-
     .menu-toggle {
       display: none;
       font-size: 1.6rem;
       cursor: pointer;
     }
 
-    /* ===== Mobile Navbar ===== */
     @media (max-width: 768px) {
       .menu-toggle {
         display: block;
       }
-
       .nav-links {
         position: absolute;
         top: 60px;
@@ -87,7 +81,6 @@
         gap: 1rem;
         display: none;
       }
-
       .nav-links.show {
         display: flex;
       }
@@ -108,16 +101,6 @@
       border-bottom: 1px solid #ddd;
     }
 
-    .chat-header h3 {
-      color: #1b5e20;
-      font-size: 1.1rem;
-    }
-
-    .chat-header p {
-      font-size: 0.85rem;
-      color: var(--dark-gray);
-    }
-
     .chat-body {
       flex: 1;
       padding: 1rem;
@@ -134,19 +117,18 @@
       border-radius: 14px;
       font-size: 0.9rem;
       line-height: 1.4;
+      word-wrap: break-word;
     }
 
     pre {
       white-space: pre-wrap;
       word-break: break-word;
-      overflow-wrap: anywhere;
     }
 
     .bot {
       max-width: 90%;
       background: #fff;
       border: 1px solid #ddd;
-      color: #333;
       align-self: flex-start;
     }
 
@@ -180,7 +162,6 @@
       background: var(--green);
       color: #fff;
       cursor: pointer;
-      font-size: 0.9rem;
     }
 
     .chat-input button:hover {
@@ -194,9 +175,7 @@
   <!-- ================= NAVBAR ================= -->
   <nav class="top-nav">
     <div class="logo">GreenCity</div>
-
     <div class="menu-toggle" onclick="toggleMenu()">☰</div>
-
     <ul class="nav-links" id="navLinks">
       <li><a href="#">Home</a></li>
       <li><a href="#">Report Waste</a></li>
@@ -213,48 +192,72 @@
     </div>
 
     <div class="chat-body" id="messageBox">
-      <div class="message bot">Hello 👋 I’m the GreenCity Assistant. How can I help you today?</div>
-      <div class="message user">How do I report garbage collection issues?</div>
       <div class="message bot">
-        <pre>You can report issues from the “Report Waste” section on the home page.</pre>
+        Hello 👋 I’m the GreenCity Assistant. How can I help you today?
       </div>
     </div>
 
     <div class="chat-input">
-      <input type="text" id="userInput" placeholder="Type your question here..." onchange="sendMessage()" />
+      <input
+        type="text"
+        id="userInput"
+        placeholder="Type your question here..."
+      />
       <button onclick="sendMessage()">Send</button>
     </div>
   </div>
 
   <!-- ================= JS ================= -->
- 
   <script>
-    let messageBox = document.getElementById("messageBox");
-function sendMessage(){
-    let userInput = document.getElementById("userInput").value;
-    messageBox.innerHTML+=`<div class="message user" id="userMessage">${userInput}</div>`
-    getResponse(userInput)
-    document.getElementById("userInput").value=""
-}
+    const messageBox = document.getElementById("messageBox");
+    const userInputEl = document.getElementById("userInput");
 
-function getResponse(prompt){
-    fetch(`https://posttraumatic-preterlegal-chante.ngrok-free.dev/api/${prompt}`,
-      {
-        headers: {
-    "ngrok-skip-browser-warning": "true"
-  }
+    function toggleMenu() {
+      document.getElementById("navLinks").classList.toggle("show");
+    }
+
+    async function sendMessage() {
+      const message = userInputEl.value.trim();
+      if (!message) return;
+
+      messageBox.innerHTML += `<div class="message user">${message}</div>`;
+      userInputEl.value = "";
+
+      const typing = document.createElement("div");
+      typing.className = "message bot";
+      typing.textContent = "Typing...";
+      messageBox.appendChild(typing);
+      messageBox.scrollTop = messageBox.scrollHeight;
+
+      try {
+        const response = await fetch(
+          `https://posttraumatic-preterlegal-chante.ngrok-free.dev/api/${encodeURIComponent(message)}`,
+          {
+            headers: {
+              "ngrok-skip-browser-warning": "true"
+            }
+          }
+        );
+
+        const text = await response.text();
+        typing.innerHTML = `<pre>${text.replace(/\*/g, "")}</pre>`;
+      } catch (err) {
+        typing.textContent = "❌ Server error. Please try again.";
+        console.error(err);
       }
-    )
-    .then(data=>data.text())
-    .then(data=>messageBox.innerHTML+=`<div class="message bot"><pre>${data.replace(/\*/g, "")}</pre></div>`)
-    .catch(error=>{
-        console.log("Error"+error)
-    })
-}
+
+      messageBox.scrollTop = messageBox.scrollHeight;
+    }
+
+    userInputEl.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") sendMessage();
+    });
   </script>
 
 </body>
 </html>
+
+
 
 
 
